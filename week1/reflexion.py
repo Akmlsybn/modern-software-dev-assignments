@@ -15,7 +15,14 @@ Keep the implementation minimal.
 """
 
 # TODO: Fill this in!
-YOUR_REFLEXION_PROMPT = ""
+YOUR_REFLEXION_PROMPT = """
+You are a senior Python engineer reviewing failed test cases.
+Your goal is to correct the provided function so it passes all given rules.
+
+REQUIREMENTS:
+- Return strictly ONE Python code block containing the updated `is_valid_password` function.
+- No greetings, no markdown outside the code block, and no explanations.
+"""
 
 
 # Ground-truth test suite used to evaluate generated code
@@ -96,7 +103,20 @@ def your_build_reflexion_context(prev_code: str, failures: List[str]) -> str:
 
     Return a string that will be sent as the user content alongside the reflexion system prompt.
     """
-    return ""
+    error_list = "\n".join(f"* {err}" for err in failures)
+    
+    return (
+        "The following implementation has failed some tests:\n"
+        f"```python\n{prev_code}\n```\n\n"
+        "Here are the specific error messages:\n"
+        f"{error_list}\n\n"
+        "To fix this, ensure the password meets these exact requirements:\n"
+        "- Minimum 8 characters in length.\n"
+        "- Contains at least 1 uppercase letter.\n"
+        "- Contains at least 1 lowercase letter.\n"
+        "- Contains at least 1 number.\n"
+        "- Contains at least 1 special character from: !@#$%^&*()-_"
+    )
 
 
 def apply_reflexion(

@@ -8,7 +8,16 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are a highly precise mathematical reasoning assistant. You must solve the problem step-by-step and provide a clear chain of thought.
+
+When solving modular exponentiation problems like 3^{12345} (mod 100), you should:
+1. Use Euler's theorem or direct computation to simplify the exponent modulo φ(100)
+2. Break down the computation into manageable steps
+3. Show intermediate results clearly
+4. Provide only the final numeric answer on the last line in the format "Answer: <number>"
+
+"""
 
 
 USER_PROMPT = """

@@ -37,7 +37,12 @@ QUESTION = (
 
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are an expert API integration engineer.
+Your task is to write clean, precise Python code using the `requests` library.
+Base your code STRICTLY on the provided Context.
+Output EXACTLY one fenced python code block (```python ... ```). Do not include any conversational text or explanations.
+"""
 
 
 # For this simple example
@@ -56,7 +61,7 @@ def YOUR_CONTEXT_PROVIDER(corpus: List[str]) -> List[str]:
 
     For example, return [] to simulate missing context, or [corpus[0]] to include the API docs.
     """
-    return []
+    return corpus
 
 
 def make_user_prompt(question: str, context_docs: List[str]) -> str:

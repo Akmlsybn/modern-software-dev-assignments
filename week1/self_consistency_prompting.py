@@ -9,7 +9,20 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in! Try to get as close to 100% correctness across all runs as possible.
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are a highly logical mathematical problem solver. 
+You must solve the given problem by thinking step-by-step. 
+
+Follow these steps strictly:
+1. Identify the total distance.
+2. Identify the exact mile mark of the first stop.
+3. Calculate the exact mile mark of the second stop (Total distance minus distance from the end).
+4. Calculate the distance between the first and second stops.
+
+CRITICAL FORMATTING RULE:
+On the very last line of your response, you MUST output the final number exactly like this:
+Answer: <number>
+"""
 
 USER_PROMPT = """
 Solve this problem, then give the final answer on the last line as "Answer: <number>".

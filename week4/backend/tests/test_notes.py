@@ -17,3 +17,13 @@ def test_create_and_list_notes(client):
     assert r.status_code == 200
     items = r.json()
     assert len(items) >= 1
+
+def test_search_notes(client):
+    client.post("/notes/", json={"title": "Resep Masakan", "content": "Bawang, telur"})
+    client.post("/notes/", json={"title": "Tugas Kuliah", "content": "Belajar AI"})
+    
+    response = client.get("/notes/search/?q=Masakan")
+    assert response.status_code == 200
+    assert len(response.json()) >= 1
+
+

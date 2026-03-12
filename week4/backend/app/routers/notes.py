@@ -1,8 +1,9 @@
 from typing import Optional
-
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from week6.backend.app import models, schemas
 
 from ..db import get_db
 from ..models import Note
@@ -16,6 +17,13 @@ def list_notes(db: Session = Depends(get_db)) -> list[NoteRead]:
     rows = db.execute(select(Note)).scalars().all()
     return [NoteRead.model_validate(row) for row in rows]
 
+@router.get("/search/", response_model=List[schemas.Note])
+def search_notes(q: str, db: Session = Depends(get_db)):
+    """Mencari notes berdasarkan judul atau konten."""
+    notes = db.query(models.Note).filter(
+        (models.Note.title.contains(q)) | (models.Note.content.contains(q))
+    ).all()
+    return notes
 
 @router.post("/", response_model=NoteRead, status_code=201)
 def create_note(payload: NoteCreate, db: Session = Depends(get_db)) -> NoteRead:

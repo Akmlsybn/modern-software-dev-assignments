@@ -12,5 +12,38 @@ def test_create_and_complete_action_item(client):
 
     r = client.get("/action-items/")
     assert r.status_code == 200
-    items = r.json()
-    assert len(items) == 1
+    body = r.json()
+    assert "items" in body
+    assert "total" in body
+    assert body["total"] == 1
+    assert len(body["items"]) == 1
+
+
+def test_action_items_pagination_empty_last_page(client):
+    # Create 3 items, fetch page 2 with page_size=2 (1 item expected)
+    for i in range(3):
+        client.post("/action-items/", json={"description": f"Task {i}"})
+
+    r = client.get("/action-items/", params={"page": 2, "page_size": 2})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["total"] == 3
+    assert len(body["items"]) == 1
+
+    # Page beyond last — 0 items, total unchanged
+    r = client.get("/action-items/", params={"page": 3, "page_size": 2})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["total"] == 3
+    assert len(body["items"]) == 0
+
+
+def test_action_items_pagination_large_page_size(client):
+    for i in range(3):
+        client.post("/action-items/", json={"description": f"Task {i}"})
+
+    r = client.get("/action-items/", params={"page": 1, "page_size": 100})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["total"] == 3
+    assert len(body["items"]) == 3

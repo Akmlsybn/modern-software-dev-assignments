@@ -36,6 +36,7 @@ def client() -> Generator[TestClient, None, None]:
     with TestClient(app) as c:
         yield c
 
+    engine.dispose()  # release file handle before deletion (required on Windows)
     os.unlink(db_path)
 
 

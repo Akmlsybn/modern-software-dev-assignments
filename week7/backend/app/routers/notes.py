@@ -5,10 +5,23 @@ from sqlalchemy import asc, desc, select
 from sqlalchemy.orm import Session
 
 from ..db import get_db
-from ..models import Note
+from ..models import Note, Tag
 from ..schemas import NoteCreate, NotePatch, NoteRead
 
 router = APIRouter(prefix="/notes", tags=["notes"])
+
+
+def _resolve_tags(db: Session, tag_names: list[str]) -> list[Tag]:
+    """Return Tag ORM objects for each name, creating missing ones."""
+    tags = []
+    for name in tag_names:
+        tag = db.execute(select(Tag).where(Tag.name == name)).scalar_one_or_none()
+        if tag is None:
+            tag = Tag(name=name)
+            db.add(tag)
+            db.flush()
+        tags.append(tag)
+    return tags
 
 
 @router.get("/", response_model=list[NoteRead])
@@ -39,6 +52,9 @@ def create_note(payload: NoteCreate, db: Session = Depends(get_db)) -> NoteRead:
     note = Note(title=payload.title, content=payload.content)
     db.add(note)
     db.flush()
+    if payload.tags is not None:
+        note.tags = _resolve_tags(db, payload.tags)
+        db.flush()
     db.refresh(note)
     return NoteRead.model_validate(note)
 
@@ -52,6 +68,8 @@ def patch_note(note_id: int, payload: NotePatch, db: Session = Depends(get_db)) 
         note.title = payload.title
     if payload.content is not None:
         note.content = payload.content
+    if payload.tags is not None:
+        note.tags = _resolve_tags(db, payload.tags)
     db.add(note)
     db.flush()
     db.refresh(note)
